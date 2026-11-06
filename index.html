@@ -4,65 +4,160 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hotter Summers, Bigger Bills</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="module" src="main.js"></script>
+  <link rel="stylesheet" href="style.css?v=3" />
+  <script type="module" src="main.js?v=3"></script>
 </head>
 <body>
+  <!-- ============ HOOK ============ -->
   <header class="hero">
-    <p class="kicker">DSC 106 Final Project · Prototype</p>
+    <p class="kicker">DSC 106 Final Project</p>
     <h1>Hotter Summers, Bigger Bills</h1>
-    <p class="lede">How many more days of air conditioning will your city need by the time you retire?</p>
+    <p class="lede">By the time today’s college students retire, how many more days will their city need air conditioning?</p>
+    <div class="pick">
+      <label for="heroCity">Pick a city to follow through the story:</label>
+      <select id="heroCity"></select>
+    </div>
+    <p class="hero-answer" id="heroAnswer"></p>
     <p class="byline">Shaun Israni · Corey Ngo · Abhinav Krishna · Srinivas Sriram</p>
+    <p class="scroll-hint">Scroll to find out ↓</p>
   </header>
 
-  <section class="intro">
-    <p>Climate change is usually reported as one global number, like “+2.7&nbsp;°C by 2100.” That is hard to feel. Everyone, though, feels their summer cooling bill. We turned CMIP6 climate-model temperature projections into <b>cooling-degree-days (CDD)</b>, the measure utilities use for air-conditioning demand. Each degree a day’s average temperature sits above 65&nbsp;°F adds one CDD.</p>
+  <section class="prose">
+    <p>Climate change usually arrives as one global number, like “+2.7&nbsp;°C by 2100.” It is hard to feel a global average. But everyone feels a summer power bill. So we translated climate-model temperature projections (CMIP6) into <b>cooling-degree-days (CDD)</b>, the number utilities use to forecast air-conditioning demand. Every degree that a day’s average temperature sits above 65&nbsp;°F adds one CDD. A city with 3,000 CDD a year needs roughly three times as much cooling as one with 1,000.</p>
   </section>
 
-  <div class="controls" id="controls">
-    <label>Scenario
-      <select id="scenario">
-        <option value="ssp126">SSP1-2.6 · strong climate action</option>
-        <option value="ssp245">SSP2-4.5 · middle of the road</option>
-        <option value="ssp585" selected>SSP5-8.5 · high emissions</option>
-      </select>
-    </label>
-    <label>City
-      <select id="city"></select>
-    </label>
-    <label class="toggle"><input type="checkbox" id="showModels" /> Show individual climate models</label>
-  </div>
-
-  <section class="chart-block">
-    <h2>1 · Where cooling demand grows</h2>
-    <p class="caption">Added cooling-degree-days per year, 2070–2099 vs 1985–2014. Circle area shows the increase. <b>Hover</b> a city for numbers; <b>click</b> it to load it in the chart below.</p>
-    <div id="map" class="chart"></div>
+  <!-- ============ SCROLLYTELLING ============ -->
+  <section id="scrolly">
+    <div class="steps">
+      <div class="step" data-step="base">
+        <p class="beat">Today</p>
+        <h3>Cooling is a Sun Belt story</h3>
+        <p id="s-base"></p>
+      </div>
+      <div class="step" data-step="delta">
+        <p class="beat">And…</p>
+        <h3>Every city is heading the same way</h3>
+        <p id="s-delta"></p>
+      </div>
+      <div class="step" data-step="ratio">
+        <p class="beat">But…</p>
+        <h3>The biggest <em>relative</em> jumps are in the North</h3>
+        <p id="s-ratio"></p>
+      </div>
+      <div class="step" data-step="city">
+        <p class="beat">Your city</p>
+        <h3 id="s-city-h"></h3>
+        <p id="s-city"></p>
+      </div>
+      <div class="step" data-step="scenarios">
+        <p class="beat">Therefore…</p>
+        <h3>The emissions path we choose sets the size of the bill</h3>
+        <p id="s-scen"></p>
+      </div>
+      <div class="step" data-step="models">
+        <p class="beat">How sure are we?</p>
+        <h3>Models disagree on <em>how much</em>, not <em>which way</em></h3>
+        <p id="s-models"></p>
+      </div>
+    </div>
+    <div class="sticky">
+      <div class="view" id="v-map"></div>
+      <div class="view" id="v-bars"></div>
+      <div class="view" id="v-line"></div>
+      <p class="view-caption" id="viewCaption"></p>
+    </div>
   </section>
 
-  <section class="chart-block">
-    <h2>2 · One city, three futures</h2>
-    <p class="caption" id="lineCaption"></p>
-    <div id="line" class="chart"></div>
-    <div class="legend" id="lineLegend"></div>
+  <!-- ============ SEASON ============ -->
+  <section class="block" id="season">
+    <h2>Summer doesn’t just get hotter. It gets longer.</h2>
+    <p class="caption">Mean cooling-degree-days per month in <b>Phoenix</b>, decade by decade (GFDL-ESM4 model). Each row is a decade; darker means more cooling. Drag the slider or press play to watch the cooling season spread into spring and fall.</p>
+    <div class="controls inline">
+      <label>Scenario
+        <select id="seasonScenario">
+          <option value="ssp126">SSP1-2.6 · strong climate action</option>
+          <option value="ssp245">SSP2-4.5 · middle of the road</option>
+          <option value="ssp585" selected>SSP5-8.5 · high emissions</option>
+        </select>
+      </label>
+      <button id="play" type="button">▶ Play</button>
+      <input type="range" id="decade" min="0" max="10" value="0" step="1" aria-label="Decade" />
+      <output id="decadeLabel"></output>
+    </div>
+    <div id="heat" class="chart"></div>
+    <p class="readout" id="seasonReadout"></p>
   </section>
 
-  <section class="chart-block">
-    <h2>3 · But the biggest <em>relative</em> jumps are in cooler cities</h2>
-    <p class="caption">End-century demand as a multiple of today’s, for the selected scenario. Hot cities add the most degree-days; cold cities multiply the most.</p>
-    <div id="bars" class="chart"></div>
+  <!-- ============ PERSONAL BILL ============ -->
+  <section class="block" id="bill">
+    <h2>What would that do to <em>your</em> bill?</h2>
+    <p class="caption">Air-conditioning use scales roughly with cooling-degree-days. Enter what you pay to cool your home in a typical summer month today, and we’ll scale it by your city’s projected change. Prices are held at today’s rates, so this isolates the effect of the weather.</p>
+    <div class="bill-grid">
+      <label>City <select id="billCity"></select></label>
+      <label>Summer cooling cost today <span class="money"><span>$</span><input type="number" id="billInput" value="120" min="0" step="5" /></span> / month</label>
+      <label>Scenario
+        <select id="billScenario">
+          <option value="ssp126">SSP1-2.6</option>
+          <option value="ssp245" selected>SSP2-4.5</option>
+          <option value="ssp585">SSP5-8.5</option>
+        </select>
+      </label>
+    </div>
+    <div id="billChart" class="chart"></div>
+    <p class="readout" id="billReadout"></p>
   </section>
 
-  <section class="writeup">
-    <h2>Prototype write-up</h2>
-    <h3>What have we done so far?</h3>
-    <p>We pulled monthly near-surface air temperature (<code>tas</code>) directly from the public CMIP6 Zarr store on Google Cloud for three climate models (GFDL-ESM4, MPI-ESM1-2-LR and MRI-ESM2-0), covering the historical run (1985–2014) and three future scenarios (SSP1-2.6, SSP2-4.5 and SSP5-8.5) through 2100. For eleven U.S. cities we took the nearest grid cell and converted temperature to annual cooling-degree-days, then exported a compact JSON file that the page loads with D3. This prototype includes three linked D3 views: a map of added cooling demand, a time-series chart for one city under three scenarios, and a bar chart of relative change. The scenario menu updates all three charts at once, the city menu and map clicks drive the time series, hovering any mark shows exact values, and a checkbox reveals how much the individual models disagree.</p>
-
-    <h3>What will be the most challenging part to design, and why?</h3>
-    <p>The hardest design problem is showing uncertainty honestly without burying the story: the three models disagree by hundreds of degree-days, and we want readers to see that spread while still taking away the clear direction of change. A second challenge is the narrative structure, because we want to turn these linked charts into a scroll-driven story (with Scrollama) that moves from “the Sun Belt gets hotter” to the surprise that cooler northern cities face the biggest relative jumps. We also need to switch from monthly to daily temperature data, since monthly averages underestimate cooling-degree-days, especially for coastal cities like Seattle, and the daily files are far larger to process. Finally, translating degree-days into a household dollar cost requires careful, clearly labeled assumptions so the number feels personal without overstating precision.</p>
+  <!-- ============ FREE EXPLORE ============ -->
+  <section class="block" id="explore">
+    <h2>Explore it yourself</h2>
+    <p class="caption">All three views are linked. Pick a scenario and city, hover any mark for exact values, and click a city on the map or in the bars to load it in the line chart.</p>
+    <div class="controls" id="exploreControls">
+      <label>Scenario
+        <select id="exScenario">
+          <option value="ssp126">SSP1-2.6</option>
+          <option value="ssp245">SSP2-4.5</option>
+          <option value="ssp585" selected>SSP5-8.5</option>
+        </select>
+      </label>
+      <label>City <select id="exCity"></select></label>
+      <label class="toggle"><input type="checkbox" id="exModels" /> Show individual models</label>
+    </div>
+    <div class="explore-grid">
+      <div><h3>Added cooling-degree-days, 2070–2099</h3><div id="ex-map" class="chart"></div></div>
+      <div><h3>Change relative to today</h3><div id="ex-bars" class="chart"></div></div>
+    </div>
+    <h3 id="exLineTitle"></h3>
+    <div id="ex-line" class="chart"></div>
   </section>
 
+  <!-- ============ TAKEAWAY ============ -->
+  <section class="takeaway">
+    <h2>The takeaway</h2>
+    <p class="big">The places that will feel hotter summers the most are the ones least built for them.</p>
+    <p>Phoenix and Miami will add the most cooling-degree-days, but they already have air conditioning everywhere. Minneapolis, Chicago and New York will see their cooling demand double to quadruple, in cities where many homes, schools and apartments were never built to be cooled. Seeing every city on one map hides that; putting absolute and relative change side by side, and following one city through three futures, makes it obvious. And the gap between the scenarios shows this is still a choice: under strong climate action, cooling demand levels off by mid-century instead of climbing all the way to 2100.</p>
+  </section>
+
+  <!-- ============ VIDEO ============ -->
+  <section class="block" id="video">
+    <h2>Demo video</h2>
+    <div class="video-slot" id="videoSlot">
+      <!-- Replace the paragraph below with the YouTube embed:
+           <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Hotter Summers, Bigger Bills demo" allowfullscreen></iframe> -->
+      <p>Video coming soon.</p>
+    </div>
+  </section>
+
+  <!-- ============ METHODS ============ -->
   <footer>
-    <p>Data: CMIP6 via the NOAA/Pangeo public dataset on Google Cloud (<code>gs://cmip6</code>), <code>Amon/tas</code>, member r1i1p1f1. CDD computed from monthly means (base 65&nbsp;°F); absolute values run below station-based normals, relative changes are robust.</p>
+    <h2>Data &amp; methods</h2>
+    <ul>
+      <li><b>Source:</b> CMIP6 climate model output from the NOAA/Pangeo public dataset on Google Cloud (<code>gs://cmip6</code>): monthly near-surface air temperature (<code>Amon/tas</code>, member r1i1p1f1).</li>
+      <li><b>Models:</b> GFDL-ESM4, MPI-ESM1-2-LR and MRI-ESM2-0. Lines show the three-model mean unless noted.</li>
+      <li><b>Scenarios:</b> historical (1985–2014) and SSP1-2.6, SSP2-4.5, SSP5-8.5 (2015–2100).</li>
+      <li><b>Cooling-degree-days:</b> for the grid cell nearest each city, days in month × max(0, monthly mean °F − 65), summed per year. Trend lines use a 10-year rolling mean.</li>
+      <li><b>Limitations:</b> monthly means and ~1° grid cells smooth out hot days, so absolute CDD run below station-based normals (Phoenix ≈3,100 here vs ≈4,500 observed) and coastal Seattle reads near zero (excluded from ratios). Relative changes and directions are robust. The bill estimate holds electricity prices and home efficiency constant.</li>
+    </ul>
+    <p class="team">Shaun Israni · Corey Ngo · Abhinav Krishna · Srinivas Sriram · DSC 106, UC San Diego</p>
   </footer>
 
   <div id="tooltip" class="tooltip" hidden></div>
