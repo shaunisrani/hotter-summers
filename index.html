@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotter Summers, Bigger Bills</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <p class="kicker">DSC 106 Final Project · Prototype</p>
+    <h1>Hotter Summers, Bigger Bills</h1>
+    <p class="lede">How many more days of air conditioning will your city need by the time you retire?</p>
+    <p class="byline">Shaun Israni · Corey Ngo · Abhinav Krishna · Srinivas Sriram</p>
+  </header>
+
+  <section class="intro">
+    <p>Climate change is usually reported as one global number, like “+2.7&nbsp;°C by 2100.” That is hard to feel. Everyone, though, feels their summer cooling bill. We turned CMIP6 climate-model temperature projections into <b>cooling-degree-days (CDD)</b>, the measure utilities use for air-conditioning demand. Each degree a day’s average temperature sits above 65&nbsp;°F adds one CDD.</p>
+  </section>
+
+  <div class="controls" id="controls">
+    <label>Scenario
+      <select id="scenario">
+        <option value="ssp126">SSP1-2.6 · strong climate action</option>
+        <option value="ssp245">SSP2-4.5 · middle of the road</option>
+        <option value="ssp585" selected>SSP5-8.5 · high emissions</option>
+      </select>
+    </label>
+    <label>City
+      <select id="city"></select>
+    </label>
+    <label class="toggle"><input type="checkbox" id="showModels" /> Show individual climate models</label>
+  </div>
+
+  <section class="chart-block">
+    <h2>1 · Where cooling demand grows</h2>
+    <p class="caption">Added cooling-degree-days per year, 2070–2099 vs 1985–2014. Circle area shows the increase. <b>Hover</b> a city for numbers; <b>click</b> it to load it in the chart below.</p>
+    <div id="map" class="chart"></div>
+  </section>
+
+  <section class="chart-block">
+    <h2>2 · One city, three futures</h2>
+    <p class="caption" id="lineCaption"></p>
+    <div id="line" class="chart"></div>
+    <div class="legend" id="lineLegend"></div>
+  </section>
+
+  <section class="chart-block">
+    <h2>3 · But the biggest <em>relative</em> jumps are in cooler cities</h2>
+    <p class="caption">End-century demand as a multiple of today’s, for the selected scenario. Hot cities add the most degree-days; cold cities multiply the most.</p>
+    <div id="bars" class="chart"></div>
+  </section>
+
+  <section class="writeup">
+    <h2>Prototype write-up</h2>
+    <h3>What have we done so far?</h3>
+    <p>We pulled monthly near-surface air temperature (<code>tas</code>) directly from the public CMIP6 Zarr store on Google Cloud for three climate models (GFDL-ESM4, MPI-ESM1-2-LR and MRI-ESM2-0), covering the historical run (1985–2014) and three future scenarios (SSP1-2.6, SSP2-4.5 and SSP5-8.5) through 2100. For eleven U.S. cities we took the nearest grid cell and converted temperature to annual cooling-degree-days, then exported a compact JSON file that the page loads with D3. This prototype includes three linked D3 views: a map of added cooling demand, a time-series chart for one city under three scenarios, and a bar chart of relative change. The scenario menu updates all three charts at once, the city menu and map clicks drive the time series, hovering any mark shows exact values, and a checkbox reveals how much the individual models disagree.</p>
+
+    <h3>What will be the most challenging part to design, and why?</h3>
+    <p>The hardest design problem is showing uncertainty honestly without burying the story: the three models disagree by hundreds of degree-days, and we want readers to see that spread while still taking away the clear direction of change. A second challenge is the narrative structure, because we want to turn these linked charts into a scroll-driven story (with Scrollama) that moves from “the Sun Belt gets hotter” to the surprise that cooler northern cities face the biggest relative jumps. We also need to switch from monthly to daily temperature data, since monthly averages underestimate cooling-degree-days, especially for coastal cities like Seattle, and the daily files are far larger to process. Finally, translating degree-days into a household dollar cost requires careful, clearly labeled assumptions so the number feels personal without overstating precision.</p>
+  </section>
+
+  <footer>
+    <p>Data: CMIP6 via the NOAA/Pangeo public dataset on Google Cloud (<code>gs://cmip6</code>), <code>Amon/tas</code>, member r1i1p1f1. CDD computed from monthly means (base 65&nbsp;°F); absolute values run below station-based normals, relative changes are robust.</p>
+  </footer>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+</body>
+</html>
